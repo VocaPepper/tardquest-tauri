@@ -11,7 +11,14 @@ Thumbs.db
 .DS_Store
 
 # Game files
-src/game/*
+src/game/assets
+src/game/audio
+src/game/data
+src/game/fonts
+src/game/scripts
+src/game/game.html
+src/game/index.html
+src/game/styles.css
 
 # Logs
 *.log
