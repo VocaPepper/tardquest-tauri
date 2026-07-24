@@ -43,4 +43,4 @@ npm run tauri:android:build
 
 ## License
 
-MIT © VocaPepper
+MIT © TardQuest Team
