@@ -1,0 +1,24 @@
+{
+  "name": "tardquest-online",
+  "version": "2.0.0",
+  "description": "Tauri port of TardQuest Online II: A Realm Unborn",
+  "author": "VocaPepper",
+  "license": "ISC",
+  "scripts": {
+    "tauri:dev": "cargo tauri dev",
+    "tauri:build": "cargo tauri build",
+    "tauri:build:win": "cargo tauri build --target x86_64-pc-windows-msvc",
+    "tauri:build:linux": "cargo tauri build --target x86_64-unknown-linux-gnu",
+    "tauri:android:init": "cargo tauri android init",
+    "tauri:android:dev": "cargo tauri android dev",
+    "tauri:android:build": "cargo tauri android build"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.11.1",
+    "@tauri-apps/plugin-os": "^2.3.2",
+    "@tauri-apps/plugin-updater": "^2.10.1",
+    "@tauri-apps/plugin-window-state": "^2.4.1"
+  },
+  "keywords": [],
+  "type": "commonjs"
+}

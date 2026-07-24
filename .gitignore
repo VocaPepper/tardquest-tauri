@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Rust/Tauri build artifacts
+src-tauri/target/
+src-tauri/gen/schemas/
+src-tauri/gen/android/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Game files
+src/game/*
+
+# Logs
+*.log

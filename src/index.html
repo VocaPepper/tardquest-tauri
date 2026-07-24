@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TARDQUEST Online II: A Realm Unborn</title>
+    <script type="module">
+        const isAndroid = /android/i.test(navigator.userAgent);
+        const currentPath = window.location.pathname;
+        const isSubPage = currentPath.includes('/shell/') || currentPath.includes('/game/');
+
+        if (!isSubPage) {
+            if (isAndroid) {
+                window.location.replace('game/index.html');
+            } else {
+                window.location.replace('shell/index.html');
+            }
+        }
+    </script>
+</head>
+<body></body>
+</html>
