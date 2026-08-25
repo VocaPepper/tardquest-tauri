@@ -1,6 +1,6 @@
 # TardQuest (Tauri v2) v1.20.1
 
-Tauri v2 desktop wrapper for [TardQuest](https://github.com/packardbell95/tardquest), ported from the Electron `tardquest-standalone` app. The version matches the standalone app.
+Tauri v2 desktop wrapper for [TardQuest](https://github.com/packardbell95/tardquest), ported from the Electron `tardquest-standalone` app.
 
 ## Features
 
@@ -21,8 +21,6 @@ src/
 src-tauri/            # Rust backend (window, plugins, capabilities)
 ```
 
-The game content is committed to the repository.
-
 ## Prerequisites
 
 - Rust (edition 2021, MSRV 1.77.2)
@@ -34,8 +32,6 @@ The game content is committed to the repository.
 ```sh
 npm run dev        # cargo tauri dev
 ```
-
-The shell is served statically from `src/` (no bundler). Editing `src/` requires a window reload; Rust edits rebuild automatically.
 
 ## Building
 
