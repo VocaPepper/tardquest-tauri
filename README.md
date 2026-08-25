@@ -59,6 +59,7 @@ cargo tauri build --target x86_64-unknown-linux-gnu --bundles appimage,deb
 
 - **Windows** → standalone `tardquest.exe` (no installer) uploaded as an artifact.
 - **Linux** → `AppImage` + `.deb` uploaded as an artifact.
+- Pushing a `v*` tag also publishes the cross-platform artifacts to a GitHub Release.
 
 ## Notes
 

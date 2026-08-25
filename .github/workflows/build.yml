@@ -8,9 +8,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   build:
     strategy:
@@ -20,9 +17,14 @@ jobs:
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
             artifact: tardquest-windows-standalone
+            path: |
+              src-tauri/target/x86_64-pc-windows-msvc/release/tardquest.exe
           - platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             artifact: tardquest-linux
+            path: |
+              src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
+              src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/deb/*.deb
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -39,14 +41,13 @@ jobs:
             libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev \
             librsvg2-dev libxdo-dev libssl-dev build-essential curl wget file patchelf
 
-      # Windows: build a self-contained standalone executable (no installer).
-      # `cargo build` runs the tauri build script which embeds the frontend +
-      # game, so the produced .exe is the complete, single-file app.
+      # Windows: self-contained standalone executable (no installer). cargo build
+      # runs the tauri build script, which embeds the frontend + game.
       - name: Build Windows standalone executable
         if: startsWith(matrix.platform, 'windows')
         run: cargo build --release --target ${{ matrix.target }}
 
-      # Linux: bundle the AppImage + .deb. Needs the Tauri CLI.
+      # Linux: bundle the AppImage + deb. Needs the Tauri CLI.
       - name: Install Tauri CLI
         if: startsWith(matrix.platform, 'ubuntu')
         run: cargo install tauri-cli --locked
@@ -55,20 +56,33 @@ jobs:
         if: startsWith(matrix.platform, 'ubuntu')
         run: cargo tauri build --target ${{ matrix.target }} --bundles appimage,deb
 
-      - name: Upload Windows standalone executable
-        if: startsWith(matrix.platform, 'windows')
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: src-tauri/target/${{ matrix.target }}/release/tardquest.exe
+          path: ${{ matrix.path }}
           if-no-files-found: error
 
-      - name: Upload Linux bundles
-        if: startsWith(matrix.platform, 'ubuntu')
-        uses: actions/upload-artifact@v4
+  # Publish the cross-platform artifacts to a GitHub Release when a tag is pushed.
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
         with:
-          name: ${{ matrix.artifact }}
-          path: |
-            src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage
-            src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb
-          if-no-files-found: error
+          path: dist
+          merge-multiple: true
+
+      - name: Publish GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "TardQuest ${{ github.ref_name }}" \
+            --generate-notes \
+            dist/*
