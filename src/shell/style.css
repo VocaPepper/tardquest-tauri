@@ -43,9 +43,14 @@ iframe#gameFrame {
     justify-content: center;
     align-items: flex-start;
     width: 100%;
-    height: calc(100vh - 18px);
-    margin-top: 18px;
+    height: calc(100vh - 43px);
+    margin-top: 43px;
     overflow: hidden;
+}
+
+.fullscreen-mode.fullscreen-controls-hidden .main-content {
+    height: 100%;
+    margin-top: 0;
 }
 
 /* ============================== Titlebar =============================== */
@@ -64,6 +69,7 @@ iframe#gameFrame {
     border: inset 2px;
     margin-left: 4px;
     margin-right: 4px;
+    transition: transform 0.275s ease, opacity 0.275s ease;
 }
 
 .custom-titlebar {
@@ -80,41 +86,19 @@ iframe#gameFrame {
     padding: 0px;
     user-select: none;
     box-shadow: #0000006b 0px 0px 0px 5px;
-    transition: transform 0.2s ease;
+    transition: transform 0.275s ease, opacity 0.275s ease;
 }
 
-/* ========================== Fullscreen Mode ================================ */
-
-body.is-fullscreen {
-    border: none;
-}
-
-body.is-fullscreen .custom-titlebar {
+.fullscreen-controls-hidden .custom-titlebar {
+    opacity: 0;
+    pointer-events: none;
     transform: translateY(-100%);
 }
 
-body.is-fullscreen .custom-titlebar.revealed {
-    transform: translateY(0);
-}
-
-.fullscreen-titlebar-trigger {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    z-index: 1001;
-    cursor: default;
-}
-
-body.is-fullscreen .fullscreen-titlebar-trigger {
-    display: block;
-}
-
-body.is-fullscreen .main-content {
-    height: 100vh;
-    margin-top: 0;
+.fullscreen-controls-hidden .toolbar-strip {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-45px);
 }
 
 .custom-titlebar-logo {
@@ -203,16 +187,16 @@ body.is-fullscreen .main-content {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
-.minimize { 
+.minimize {
     background-image: url("titlebar/minimize.png");
 }
-.maximize { 
+.maximize {
     background-image: url("titlebar/maximize.png");
 }
-.fullscreen { 
+.fullscreen {
     background-image: url("titlebar/fullscreen.png");
 }
-.close { 
+.close {
     background-image: url("titlebar/close.png");
 }
 
@@ -244,10 +228,71 @@ body.is-fullscreen .main-content {
 .border-selector,
 .filter-selector,
 .online-selector,
-.dev-selector {
+.dev-selector,
+.audio-volume-selector {
     -webkit-app-region: no-drag;
     margin-left: 0;
     padding-left: 0;
+}
+
+.audio-volume-selector {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    margin-right: 4px;
+    height: 21px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.audio-volume-label {
+    font-size: 12px;
+    color: #000000;
+    text-shadow: none;
+}
+
+.audio-volume {
+    appearance: none;
+    width: 94px;
+    height: 16px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.audio-volume::-webkit-slider-runnable-track {
+    height: 6px;
+    background: #808080;
+    border-top: solid 1px #404040;
+    border-bottom: solid 1px #eeeeee;
+}
+
+.audio-volume::-webkit-slider-thumb {
+    appearance: none;
+    width: 30px;
+    height: 14px;
+    margin-top: -5px;
+    background: linear-gradient(to right, #eeeeee 0%, #b1b1b1 100%);
+    border: outset 2px #b1b1b1;
+    box-sizing: border-box;
+}
+
+.audio-volume:active::-webkit-slider-thumb {
+    border-style: inset;
+    background: #d6d6d6;
+}
+
+.audio-volume:focus {
+    outline: 1px dotted #000000;
+    outline-offset: 1px;
+}
+
+.audio-volume-value {
+    min-width: 30px;
+    text-align: right;
 }
 
 /* ============================Retro Filter================================= */
@@ -274,14 +319,14 @@ body.is-fullscreen .main-content {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         linear-gradient(
-            transparent 50%, 
+            transparent 50%,
             rgba(173, 255, 173, 0.09) 50%
         ),
         linear-gradient(
             90deg,
-            transparent 50%, 
+            transparent 50%,
             rgba(255, 0, 0, 0.01) 50%,
             transparent 52%
         );
@@ -497,8 +542,3 @@ body.is-fullscreen .main-content {
 .password-modal-buttons button:active {
     background-color: #025e11;
 }
-
-
-
-
-

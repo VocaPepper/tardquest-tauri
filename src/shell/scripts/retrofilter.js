@@ -1,16 +1,16 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const crtFilter = document.getElementById('crtFilter');
     const dither = document.getElementById('ditherOverlay');
     const filterSelect = document.getElementById('filterSelect');
-    const savedFilter = localStorage.getItem('/AppData/scripts/retroFilter') || 'off';
+    const savedFilter = localStorage.getItem('retroFilter') || 'off';
 
     filterSelect.selectedIndex = 0;
 
     applyRetroFilter(savedFilter);
 
-    filterSelect.addEventListener('change', function() {
+    filterSelect.addEventListener('change', function () {
         const value = filterSelect.value;
-        localStorage.setItem('/AppData/scripts/retroFilter', value);
+        localStorage.setItem('retroFilter', value);
         applyRetroFilter(value);
         filterSelect.selectedIndex = 0;
     });

@@ -18,15 +18,15 @@ function toggleTardTest() {
         tardtestWindow.style.left = '100px';
         tardtestWindow.style.top = '100px';
         tardtestWindow.style.zIndex = '2000';
-        
+
         // Bring to front when opened
         if (typeof bringWindowToFront === 'function') {
             bringWindowToFront(tardtestWindow);
         }
-        
+
         if (!tardtestLoaded) {
             const iframe = document.createElement('iframe');
-            iframe.src = '../GameData/tests/TardTest.html';
+            iframe.src = '../game/tests/TardTest.html';
             iframe.style.width = '100%';
             iframe.style.height = '100%';
             iframe.style.border = 'none';
@@ -52,12 +52,12 @@ closeTardtestBtn.addEventListener('click', () => {
 // Drag logic for TardTest window
 tardtestTitlebar.addEventListener('pointerdown', (e) => {
     if (e.target === closeTardtestBtn) return;
-    
+
     // Bring window to front
     if (typeof bringWindowToFront === 'function') {
         bringWindowToFront(tardtestWindow);
     }
-    
+
     tardtestDragState.isDragging = true;
     const rect = tardtestWindow.getBoundingClientRect();
     tardtestDragState.dragOffsetX = e.clientX - rect.left;

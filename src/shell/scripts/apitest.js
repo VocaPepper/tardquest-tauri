@@ -18,10 +18,10 @@ function toggleAPITest() {
         apitestWindow.style.left = '150px';
         apitestWindow.style.top = '150px';
         apitestWindow.style.zIndex = '2000';
-        
+
         if (!apitestLoaded) {
             const iframe = document.createElement('iframe');
-            iframe.src = '../GameData/tests/APITest.html';
+            iframe.src = '../game/tests/APITest.html';
             iframe.style.width = '100%';
             iframe.style.height = '100%';
             iframe.style.border = 'none';
@@ -47,12 +47,12 @@ closeApitestBtn.addEventListener('click', () => {
 // Drag logic for APITest window
 apitestTitlebar.addEventListener('pointerdown', (e) => {
     if (e.target === closeApitestBtn) return;
-    
+
     // Bring window to front
     if (typeof bringWindowToFront === 'function') {
         bringWindowToFront(apitestWindow);
     }
-    
+
     apitestDragState.isDragging = true;
     const rect = apitestWindow.getBoundingClientRect();
     apitestDragState.dragOffsetX = e.clientX - rect.left;

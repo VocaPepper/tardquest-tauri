@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TARDQUEST Online II: A Realm Unborn</title>
+    <title>TARDQUEST</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -12,7 +12,7 @@
 
     <div class="custom-titlebar">
         <img class="custom-titlebar-logo" src="titlebar/logo.png">
-        <div class="custom-titlebar-name"><i>TARDQUEST Online II: A Realm Unborn</i></div>
+        <div class="custom-titlebar-name"><i>TARDQUEST - Extra 'Tarded Edition</i></div>
         <div class="window-controls">
             <button class="window-control minimize" onclick="window.tauriAPI.minimizeWindow()"></button>
             <button class="window-control fullscreen" onclick="window.tauriAPI.toggleFullscreen()"></button>
@@ -21,7 +21,7 @@
         </div>
     </div>
 
-<!----------------------------------------- Toolbar ------------------------------------
+<!----------------------------------------- Toolbar -------------------------------------->
 
     <div class="toolbar-strip">
         <div class="border-selector">
@@ -54,8 +54,22 @@
                 <option value="apitest">APITest</option>
             </select>
         </div>
+        <div class="audio-volume-selector">
+            <label class="audio-volume-label" for="audioVolume"><b>VOLUME</b> </label>
+            <input
+                class="audio-volume"
+                id="audioVolume"
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value="100"
+                aria-label="Game audio volume"
+                title="Game audio volume"
+            >
+            <span hidden id="audioVolumeValue" class="audio-volume-value"></span>
+        </div>
     </div>
--->
 
 <!----------------------------------------- Body --------------------------------------->
 
@@ -89,7 +103,7 @@
         </div>
         <div class="draggable-content" id="apitestContent"></div>
     </div>
-    
+
 <!----------------------------------- Password Modal --------------------------------->
 
     <div id="passwordModal" class="password-modal" style="display:none;">
@@ -102,28 +116,40 @@
             </div>
         </div>
     </div>
-    
+
 <!------------------------------------- Scripts --------------------------------------->
 
-    <script type="module">
-        import { getCurrentWindow } from '../lib/tauri-api/window.js';
-        const win = getCurrentWindow();
-        window.tauriAPI = {
-            minimizeWindow: () => win.minimize(),
-            maximizeWindow: () => win.toggleMaximize(),
-            closeWindow: () => win.close(),
-            async toggleFullscreen() {
-                const full = await win.isFullscreen();
-                await win.setFullscreen(!full);
-            },
-            onFullscreenChange(callback) {
-                win.onFullscreenChanged(({ payload: isFullscreen }) => {
-                    callback(null, isFullscreen);
-                });
-            }
-        };
+    <script>
+        // Tauri window API bridge, reusing the standalone's window.electronAPI shape.
+        (() => {
+            const win = window.__TAURI__.window.getCurrentWindow();
+            window.tauriAPI = {
+                minimizeWindow: () => win.minimize(),
+                maximizeWindow: () => win.toggleMaximize(),
+                closeWindow: () => win.close(),
+                async toggleFullscreen() {
+                    const full = await win.isFullscreen();
+                    await win.setFullscreen(!full);
+                },
+                isFullscreen: () => win.isFullscreen(),
+                startDragging: () => win.startDragging(),
+                onFullscreenChange(callback) {
+                    const check = () => {
+                        win.isFullscreen().then((full) => callback(null, full));
+                    };
+                    win.onResized(check);
+                    check();
+                }
+            };
+        })();
     </script>
     <script src="scripts/titlebar.js"></script>
+    <script src="scripts/retrofilter.js"></script>
+    <script src="scripts/tardboard.js"></script>
+    <script src="scripts/tardtest.js"></script>
+    <script src="scripts/apitest.js"></script>
+    <script src="https://milklounge.wang/tardquest/devtools.js"></script>
+    <script src="scripts/audio.js"></script>
     <script src="scripts/windowfocus.js"></script>
 </body>
 </html>

@@ -6,13 +6,13 @@ const leaderboardTitlebar = document.getElementById('leaderboardTitlebar');
 let leaderboardLoaded = false;
 
 // Dropdown toggle logic
-onlineSelect.addEventListener('change', function() {
+onlineSelect.addEventListener('change', function () {
     if (this.value === 'tardboard') {
         if (leaderboardWindow.style.display === 'none') {
             leaderboardWindow.style.display = 'flex';
             if (!leaderboardLoaded) {
                 const iframe = document.createElement('iframe');
-                iframe.src = '../GameData/leaderboard.html';
+                iframe.src = '../game/leaderboard.html';
                 iframe.style.width = '100%';
                 iframe.style.height = '100%';
                 iframe.style.border = 'none';
@@ -44,10 +44,10 @@ let isDragging = false, dragOffsetX = 0, dragOffsetY = 0;
 
 leaderboardTitlebar.addEventListener('pointerdown', (e) => {
     if (e.target === closeLeaderboardBtn) return;
-    
+
     // Bring window to front
     bringWindowToFront(leaderboardWindow);
-    
+
     isDragging = true;
     const rect = leaderboardWindow.getBoundingClientRect();
     dragOffsetX = e.clientX - rect.left;

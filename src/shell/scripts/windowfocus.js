@@ -30,11 +30,13 @@ function focusGameFrame() {
 }
 
 document.addEventListener('pointerdown', (event) => {
-    // Don't steal focus from draggable sub-windows (they manage their own)
-    if (event.target.closest('.draggable-window')) return;
-
-    // Don't interfere with the password modal
-    if (event.target.closest('#passwordModal')) return;
+    // Skip any interactive control — dropdowns, volume slider, window-control
+    // buttons, draggable sub-windows, and the password modal manage their own focus.
+    if (event.target.closest(
+        'select, input, button, textarea, a, .toolbar-strip, .window-control, .draggable-window, #passwordModal'
+    )) {
+        return;
+    }
 
     // For everything else — border clicks, titlebar clicks, main-content
     // background — restore focus to the game iframe after the event settles

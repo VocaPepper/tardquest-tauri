@@ -3,7 +3,7 @@ function changeBorder() {
     const selectedBorder = select.value;
     const bodyStyle = document.body.style;
     const htmlStyle = document.documentElement.style;
-    
+
     if (selectedBorder === '') {
         bodyStyle.backgroundImage = 'none';
         htmlStyle.backgroundImage = 'none';
@@ -11,7 +11,7 @@ function changeBorder() {
         select.selectedIndex = 0;
         return;
     }
-    
+
     // Set the background image
     bodyStyle.backgroundImage = `url("borders/${selectedBorder}")`;
     htmlStyle.backgroundImage = `url("borders/${selectedBorder}")`;
@@ -29,7 +29,7 @@ function changeBorder() {
         htmlStyle.backgroundSize = 'cover';
         htmlStyle.backgroundRepeat = 'no-repeat';
     }
-    
+
     // Save to localStorage
     localStorage.setItem('selectedBorder', selectedBorder);
     select.selectedIndex = 0;
@@ -40,7 +40,7 @@ function loadSavedBorder() {
     if (savedBorder !== null) {
         const bodyStyle = document.body.style;
         const htmlStyle = document.documentElement.style;
-        
+
         if (savedBorder === '') {
             bodyStyle.backgroundImage = 'none';
             htmlStyle.backgroundImage = 'none';
@@ -68,18 +68,18 @@ function resizeFrame() {
     const originalWidth = 696;
     const originalHeight = 646;
     const aspectRatio = originalWidth / originalHeight;
-    
+
     // Calculate available space
-    const isFullscreen = document.body.classList.contains('is-fullscreen');
-    const titlebarHeight = isFullscreen ? 0 : 20;
-    const toolbarHeight = 0;
-    const borderWidth = isFullscreen ? 0 : 4; // Your body border
-    
+    const controlsHidden = document.body.classList.contains('fullscreen-controls-hidden');
+    const titlebarHeight = controlsHidden ? 0 : 20;
+    const toolbarHeight = controlsHidden ? 0 : 23;
+    const borderWidth = 4; // Your body border
+
     const availableWidth = window.innerWidth - (borderWidth * 2);
     const availableHeight = window.innerHeight - titlebarHeight - toolbarHeight - (borderWidth * 2);
-    
+
     const windowAspectRatio = availableWidth / availableHeight;
-    
+
     let scale;
     if (windowAspectRatio > aspectRatio) {
         // Height-constrained: scale to fit height
@@ -88,54 +88,101 @@ function resizeFrame() {
         // Width-constrained: scale to fit width
         scale = availableWidth / originalWidth;
     }
-    
+
     iframe.style.transform = `scale(${scale})`;
     iframe.style.transformOrigin = 'top center';
 }
 
-// Fullscreen titlebar reveal
-function setupFullscreenTitlebar() {
-    const titlebar = document.querySelector('.custom-titlebar');
-    const trigger = document.createElement('div');
-    trigger.className = 'fullscreen-titlebar-trigger';
-    document.body.insertBefore(trigger, document.body.firstChild);
+let controlsHideTimeout;
 
-    trigger.addEventListener('pointerenter', () => {
-        titlebar.classList.add('revealed');
+function setFullscreenMode(isFullscreen) {
+    document.body.classList.toggle('fullscreen-mode', isFullscreen);
+    document.body.classList.toggle('fullscreen-controls-hidden', isFullscreen);
+    resizeFrame();
+}
+
+function showFullscreenControls() {
+    clearTimeout(controlsHideTimeout);
+    document.body.classList.remove('fullscreen-controls-hidden');
+    resizeFrame();
+}
+
+function scheduleFullscreenControlsHide() {
+    clearTimeout(controlsHideTimeout);
+    if (!document.body.classList.contains('fullscreen-mode')) {
+        return;
+    }
+
+    controlsHideTimeout = setTimeout(hideFullscreenControls, 630);
+}
+
+function isToolbarDropdownFocused() {
+    const activeElement = document.activeElement;
+    return activeElement instanceof HTMLSelectElement && activeElement.closest('.toolbar-strip') !== null;
+}
+
+function hideFullscreenControls() {
+    if (document.body.classList.contains('fullscreen-mode') && !isToolbarDropdownFocused()) {
+        document.body.classList.add('fullscreen-controls-hidden');
+        resizeFrame();
+    }
+}
+
+function setupFullscreenControls() {
+    window.tauriAPI.onFullscreenChange((_event, isFullscreen) => {
+        setFullscreenMode(isFullscreen);
     });
 
-    titlebar.addEventListener('pointerleave', () => {
-        if (document.body.classList.contains('is-fullscreen')) {
-            titlebar.classList.remove('revealed');
+    window.tauriAPI.isFullscreen().then(setFullscreenMode);
+
+    document.querySelectorAll('.toolbar-strip select').forEach((dropdown) => {
+        dropdown.addEventListener('focus', showFullscreenControls);
+        dropdown.addEventListener('pointerdown', showFullscreenControls);
+        dropdown.addEventListener('keydown', showFullscreenControls);
+        dropdown.addEventListener('blur', scheduleFullscreenControlsHide);
+        dropdown.addEventListener('change', scheduleFullscreenControlsHide);
+    });
+
+    document.addEventListener('mousemove', (event) => {
+        if (!document.body.classList.contains('fullscreen-mode')) {
+            return;
+        }
+
+        if (event.clientY <= 12) {
+            showFullscreenControls();
+        } else if (!document.body.classList.contains('fullscreen-controls-hidden')) {
+            scheduleFullscreenControlsHide();
         }
     });
 }
 
-if (window.tauriAPI && window.tauriAPI.onFullscreenChange) {
-    window.tauriAPI.onFullscreenChange((event, isFullscreen) => {
-        const titlebar = document.querySelector('.custom-titlebar');
-        if (isFullscreen) {
-            document.body.classList.add('is-fullscreen');
-            titlebar.classList.remove('revealed');
-        } else {
-            document.body.classList.remove('is-fullscreen');
-            titlebar.classList.remove('revealed');
+// Frameless-window drag: Tauri has no -webkit-app-region support, so call
+// startDragging() from the OS window API on titlebar press (excluding buttons).
+function setupTitlebarDrag() {
+    const titlebar = document.querySelector('.custom-titlebar');
+    if (!titlebar || !window.tauriAPI || !window.tauriAPI.startDragging) {
+        return;
+    }
+    titlebar.addEventListener('mousedown', (event) => {
+        if (event.target.closest('.window-control')) {
+            return;
         }
-        resizeFrame();
+        window.tauriAPI.startDragging();
     });
 }
 
 // Load saved border on page load
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     loadSavedBorder();
+    setupFullscreenControls();
+    setupTitlebarDrag();
     resizeFrame();
-    setupFullscreenTitlebar();
 });
 
 resizeFrame();
 
 let resizeTimeout;
-window.addEventListener('resize', function() {
+window.addEventListener('resize', function () {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(resizeFrame, 50);
 });

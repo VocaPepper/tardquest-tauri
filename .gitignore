@@ -10,15 +10,8 @@ src-tauri/gen/android/
 Thumbs.db
 .DS_Store
 
-# Game files
-src/game/assets
-src/game/audio
-src/game/data
-src/game/fonts
-src/game/scripts
-src/game/game.html
-src/game/index.html
-src/game/styles.css
+# Game files (TardQuest game content is a build input, not committed)
+src/game/
 
 # Logs
 *.log
