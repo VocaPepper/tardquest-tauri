@@ -1,15 +1,15 @@
-# TardQuest (Tauri v2)
+# TardQuest (Tauri v2) v1.20.1
 
-A clean Tauri v2 desktop wrapper for [TardQuest](https://github.com/packardbell95/tardquest), ported from the Electron `tardquest-standalone` app.
+Tauri v2 desktop wrapper for [TardQuest](https://github.com/packardbell95/tardquest), ported from the Electron `tardquest-standalone` app. The version matches the standalone app.
 
 ## Features
 
-- Frameless window with a custom titlebar — minimize / maximize / fullscreen / close, plus draggable titlebar.
-- Toolbar: background border art selector, retro CRT filter (scanlines + dithering), TardBoard (online leaderboard), Dev tools (password-gated TardTest / APITest), and a master game-volume slider.
-- The full game runs embedded in an iframe from `src/game/`.
-- Draggable sub-windows (TardBoard, TardTest, APITest).
-- Window state persistence (position/size) via `tauri-plugin-window-state`.
-- Auto-update scaffolding via `tauri-plugin-updater`.
+- Frameless window with a custom, draggable titlebar.
+- Toolbar controls for border art, the CRT filter, TardBoard, developer tools, and game volume.
+- Game content embedded from `src/game/`.
+- Draggable TardBoard, TardTest, and APITest windows.
+- Window position and size persistence via `tauri-plugin-window-state`.
+- Auto-update support via `tauri-plugin-updater`.
 
 ## Layout
 
@@ -17,15 +17,17 @@ A clean Tauri v2 desktop wrapper for [TardQuest](https://github.com/packardbell9
 src/
   index.html          # fallback entry redirecting to shell/
   shell/              # the desktop shell (titlebar + toolbar + draggable windows)
-  game/               # TardQuest game content (build input; not committed – see .gitignore)
+  game/               # TardQuest game content
 src-tauri/            # Rust backend (window, plugins, capabilities)
 ```
+
+The game content is committed to the repository.
 
 ## Prerequisites
 
 - Rust (edition 2021, MSRV 1.77.2)
-- `cargo-tauri` CLI
-- WebView2 (Windows 10/11)
+- `cargo-tauri` CLI, or use the npm scripts below
+- WebView2 (Windows 10/11); on Linux, GTK/WebKitGTK dev packages (see CI workflow)
 
 ## Development
 
@@ -37,23 +39,31 @@ The shell is served statically from `src/` (no bundler). Editing `src/` requires
 
 ## Building
 
+The default build produces an app binary without an installer.
+
 ```sh
-# Current platform
+# Binary for the current platform
 npm run build
 
-# Specific targets
-npm run build:win     # Windows x86_64-pc-windows-msvc
-npm run build:linux   # Linux x86_64-unknown-linux-gnu
+# Explicit targets
+npm run build:win       # Windows x86_64-pc-windows-msvc
+npm run build:linux     # Linux x86_64-unknown-linux-gnu
+
+# Build Linux packages
+cargo tauri build --target x86_64-unknown-linux-gnu --bundles appimage,deb
 ```
 
-## Setup: game content
+## CI
 
-Drop the game files into `src/game/` (this repo ships for Windows/Linux, not the game). The `src/game/` directory is gitignored; the game is copied in as a build input.
+`.github/workflows/build.yml` builds automatically on push / pull-request / tag / manual dispatch:
+
+- **Windows** → standalone `tardquest.exe` (no installer) uploaded as an artifact.
+- **Linux** → `AppImage` + `.deb` uploaded as an artifact.
 
 ## Notes
 
-- The Dev password is a single constant in `src/shell/scripts/devtools.js` (`DEV_PASSWORD`). Set it to the real value before shipping.
-- Updater endpoints/pubkey are empty; configure them in `src-tauri/tauri.conf.json` and provide a signing key before enabling auto-updates.
+- Updater endpoints/pubkey are empty; configure them in `src-tauri/tauri.conf.json` and provide a signing key before enabling auto-updates. Updater artifacts are intentionally disabled until then.
+- The build is verified offline against cached crates; CI resolves dependencies normally.
 
 ## License
 

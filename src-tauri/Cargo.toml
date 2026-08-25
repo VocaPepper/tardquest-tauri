@@ -1,6 +1,6 @@
 [package]
 name = "tardquest"
-version = "1.0.0"
+version = "1.20.1"
 description = "Tauri v2 desktop wrapper for TardQuest"
 authors = ["VocaPepper"]
 license = "ISC"

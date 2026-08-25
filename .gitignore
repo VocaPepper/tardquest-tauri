@@ -10,8 +10,7 @@ src-tauri/gen/android/
 Thumbs.db
 .DS_Store
 
-# Game files (TardQuest game content is a build input, not committed)
-src/game/
+# Game files are now committed for complete builds (see src/game/)
 
 # Logs
 *.log
