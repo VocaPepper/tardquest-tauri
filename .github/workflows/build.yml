@@ -45,15 +45,18 @@ jobs:
       # runs the tauri build script, which embeds the frontend + game.
       - name: Build Windows standalone executable
         if: startsWith(matrix.platform, 'windows')
+        working-directory: src-tauri
         run: cargo build --release --target ${{ matrix.target }}
 
       # Linux: bundle the AppImage + deb. Needs the Tauri CLI.
       - name: Install Tauri CLI
         if: startsWith(matrix.platform, 'ubuntu')
+        working-directory: src-tauri
         run: cargo install tauri-cli --locked
 
       - name: Build Linux bundles (AppImage + deb)
         if: startsWith(matrix.platform, 'ubuntu')
+        working-directory: src-tauri
         run: cargo tauri build --target ${{ matrix.target }} --bundles appimage,deb
 
       - name: Upload artifact
