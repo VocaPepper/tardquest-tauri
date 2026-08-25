@@ -81,10 +81,20 @@ jobs:
           path: dist
           merge-multiple: true
 
+      # Flatten downloaded artifacts (the Linux bundle keeps appimage/ + deb/
+      # subdirectories) so `dist/*` only contains files for the release.
+      - name: Flatten downloaded artifacts
+        run: |
+          find dist -mindepth 2 -type f -exec mv -f {} dist/ \;
+          find dist -type d -empty -delete
+
       - name: Publish GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Delete any partially-created release from a previous run (idempotent),
+          # then recreate it attached to the pushed tag.
+          gh release delete "${{ github.ref_name }}" --yes 2>/dev/null || true
           gh release create "${{ github.ref_name }}" \
             --title "TardQuest ${{ github.ref_name }}" \
             --generate-notes \
